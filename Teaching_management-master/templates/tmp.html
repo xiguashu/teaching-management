@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Standard Meta -->
+    {% load staticfiles %}
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <!-- Site Properties -->
+    <title>欢迎使用浙江大学教学服务系统</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-master/dist/components/reset.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-master/dist/components/site.css' %}">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-master/dist/components/container.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-master/dist/components/grid.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-master/dist/components/header.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-master/dist/components/image.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-master/dist/components/menu.css' %}">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-master/dist/components/divider.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-master/dist/components/segment.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-master/dist/components/form.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-master/dist/components/input.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-master/dist/components/button.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-master/dist/components/list.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-master/dist/components/message.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-master/dist/components/icon.css' %}">
+
+    <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+    <style type="text/css">
+        :root .footer>#box[style="width:100%;height:100%;position:fixed;top:0"],
+        :root .text-ad-links,
+        :root .text-ads,
+        :root .text_ads,
+        :root .text_ad,
+        :root .textAd,
+        :root .text-ad,
+        :root .pub_728x90,
+        :root .pub_300x250m,
+        :root .pub_300x250 {
+            display: none !important;
+        }
+    </style>
+    <script src="{% static 'Semantic-UI-master/dist/components/form.js'%}"></script>
+    <script src="{% static 'Semantic-UI-master/dist/components/transition.js' %}"></script>
+
+    <style type="text/css">
+        body {
+            background-color: #DADADA;
+        }
+
+        body>.grid {
+            height: 100%;
+        }
+
+        .image {
+            margin-top: -100px;
+        }
+
+        .column {
+            max-width: 450px;
+        }
+    </style>
+    <script>
+        $(document)
+            .ready(function () {
+                $('.ui.form')
+                    .form({
+                        fields: {
+                            email: {
+                                identifier: 'id',
+                                rules: [
+                                    {
+                                        type: 'empty',
+                                        prompt: 'Please enter your id'
+                                    },
+                                    {
+                                        type: 'contains[315010]',
+                                        prompt: 'Please enter a valid id'
+                                    }
+                                ]
+                            },
+                            password: {
+                                identifier: 'password',
+                                rules: [
+                                    {
+                                        type: 'empty',
+                                        prompt: 'Please enter your password'
+                                    },
+                                    {
+                                        type: 'length[6]',
+                                        prompt: 'Your password must be at least 6 characters'
+                                    },
+                                    {
+                                        type: 'contains[123456]',
+                                        prompt: 'Password is incorrect'
+                                    }
+                                ]
+                            }
+                        }
+                    })
+                    ;
+            })
+            ;
+    </script>
+</head>
+
+<body>
+
+    <div class="ui middle aligned center aligned grid">
+        <div class="column">
+            <h2 class="ui teal image header">
+                <div class="content">
+                    登录到账号
+                </div>
+            </h2>
+            <form class="ui large form" action="http://127.0.0.1:8000/index/">
+                <div class="ui stacked segment">
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="user icon"></i>
+                            <input type="text" name="id" placeholder="Student id or teacher id">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            <input type="password" name="password" placeholder="Password">
+                        </div>
+                    </div>
+                    <div class="ui fluid large teal submit button">登录</div>
+                </div>
+
+                <div class="ui error message"></div>
+
+            </form>
+
+            <div class="ui message">
+                新用户？立即<a href="register">注册</a>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</body>
+
+</html>

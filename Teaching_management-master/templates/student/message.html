@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0"> {% load staticfiles %}
+    <title>浙江大学教学服务系统</title>
+    <!-- 使用本地的样式与js文件 -->
+    <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'Semantic-UI-master/dist/semantic.min.css' %}">
+    <script type="text/javascript" src="{% static 'Semantic-UI-master/dist/semantic.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'bootstrap-4.0.0-alpha.6-dist/css/bootstrap.min.css' %}">
+    <link href="{% static 'bootstrap-fileinput-master/css/fileinput.min.css' %}" rel="stylesheet" type="text/css" />
+    <script src="{% static 'bootstrap-4.0.0-alpha.6-dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/fileinput.min.js' %}"></script>
+    <script src="{% static 'bootstrap-fileinput-master/themes/fa/theme.js' %}"></script>
+
+    <!--tab切换脚本-->
+    <script>
+        $(document).ready(function() {
+            $('.ui .item[data-tab]').on('click', function() {
+                $('.ui .item[data-tab]').removeClass('active');
+                $(this).addClass('active');
+                var tab = $(this).attr("data-tab");
+                $(".tab").removeClass("active");
+                $(".tab[data-tab=\"" + tab + "\"]").addClass("active");
+            });
+        });
+
+        //通过button的value来定位对应的modal的id，实现modal.show
+        function showModal(e) {
+            $("#" + e.value).modal('show');
+        }
+    </script>
+    <!--初始化与修改函数-->
+    <script>
+        //发送私信
+        function reply() {
+            alert('发送成功');
+        }
+    </script>
+    <script>
+        //文件上传函数
+        function bs_input_file() {
+            $(".input-file").before(
+                function() {
+                    if (!$(this).prev().hasClass('input-ghost')) {
+                        var element = $("<input type='file' class='input-ghost' style='visibility:hidden; height:0'>");
+                        element.attr("name", $(this).attr("name"));
+                        element.change(function() {
+                            element.next(element).find('input').val((element.val()).split('\\').pop());
+                        });
+                        $(this).find("button.btn-choose").click(function() {
+                            element.click();
+                        });
+                        $(this).find("button.btn-reset").click(function() {
+                            element.val(null);
+                            $(this).parents(".input-file").find('input').val('');
+                        });
+                        $(this).find('input').css("cursor", "pointer");
+                        $(this).find('input').mousedown(function() {
+                            $(this).parents('.input-file').prev().click();
+                            return false;
+                        });
+                        return element;
+                    }
+                }
+            );
+        }
+
+        $(function() {
+            bs_input_file();
+        });
+    </script>
+</head>
+
+
+<body onload="init()">
+
+    <!--顶部菜单栏-->
+    <div class="ui container" style="width: 62%;margin-top: 10px">
+        <div class="ui items">
+            <div class="item">
+                <a class="ui tiny image">
+                    <img src="{% static 'img/zju4.jpg' %}">
+                </a>
+                <div class="middle aligned content">
+                    <a class="header">浙江大学教学服务系统</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ui hidden divider"></div>
+    <!--菜单栏-->
+    <div class="ui vertical masthead center aligned">
+        <div class="ui container" style="width: 63%">
+            <div class="ui attached small red visible menu">
+                <a class="item" onclick="window.location.href='student_courses?4'">课程主页</a>
+                <a class="active item" data-tab="hw_list" id="hw_tab">私信记录</a>
+                <div class="right menu">
+                    <div class="ui action input">
+                        <select class="ui compact selection dropdown">
+                        <option selected="" value="courses">课程</option>
+                        <option value="teachers">教师</option>
+                    </select>
+                        <input class="prompt" type="text" placeholder="搜索课程或教师">
+                        <button class="ui icon button">
+                        <i class="search icon"></i>
+                    </button>
+                    </div>
+                </div>
+                <a class="item" href="/student/student_courses">返回</a>
+                <a class="item" href="logout">退出</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui hidden divider"></div>
+
+    <div class="ui bottom attached active tab" data-tab="hw_list" style="min-height: 590px;">
+        <div class="ui container" style="width: 63%;">
+            <div class="ui form">
+                <div class="field">
+                    <h1 class="ui header" id="hw_name2"></h1>
+                </div>
+            </div>
+            <div class="ui hidden divider"></div>
+            <div class="ui form" id="hw_form">
+                {% for foo in History %}
+                <div class="ui raised massive segment">
+                    <div class="ui massive comments">
+                        <div class="comment">
+                            <a class="avatar">
+                                <img src="{{ foo.0 }}">
+                            </a>
+                            <div class="content">
+                                <a class="author">{{ foo.1 }}</a>
+                                <div class="metadata">
+                                    <span class="date">{{ foo.2 }}</span>
+                                </div>
+                                <div class="text">{{ foo.3 }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+        <div class="ui hidden divider"></div>
+        <div class="ui container" style='width: 63%;' id="container2">
+            <div class="ui form">
+                <div class="field">
+                    <label>发送私信：</label>
+                    <textarea rows="8" id="reply_text"></textarea>
+                </div>
+                <button class="ui button" onclick="reply()">发送</button>
+            </div>
+            <div class="ui hidden divider"></div>
+        </div>
+    </div>
+    <!--提交记录-->
+    <div class="ui bottom attached tab" data-tab="record" style="min-height: 590px;">
+        <div class="ui container">
+            <table class="ui striped celled table">
+                <thead>
+                    <th>时间</th>
+                    <th class="two wide center aligned">操作</th>
+                </thead>
+                <tbody>
+                    {% for foo in SubmitRecord %}
+
+                    <tr>
+                        <td>{{ foo.0 }}</td>
+                        {% ifequal foo.1 0 %}
+                        <td class="two wide center aligned">保存</td>
+                        {% else %}
+                        <td class="two wide center aligned">提交</td>
+                        {% endifequal %}
+
+                    </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!--底部友情链接-->
+    <div class="ui footer basic segment" style="background-color: #E0E0E0;">
+        <div class="ui center aligned container">
+            <div class="ui stackable divided equal height stackable grid">
+                <div class="five wide column">
+                    <h4 class="ui header">友情链接</h4>
+                    <div class="ui link list">
+                        <a href="http://www.zju.edu.cn" class="item">浙江大学官方网站</a>
+                        <a href="http://jwbinfosys.zju.edu.cn/default2.aspx" class="item">浙江大学现代教务管理系统</a>
+                        <a href="http://www.cs.zju.edu.cn/" class="item">浙江大学计算机科学与技术学院</a>
+                        <a href="http://www.cc98.org/" class="item">CC98论坛</a>
+                    </div>
+                </div>
+                <div class="five wide column">
+                    <h4 class="ui header">常用网站导航</h4>
+                    <div class="ui link list">
+                        <a href="https://github.com/" class="item">GitHub</a>
+                        <a href="https://scholar.google.com/" class="item">Gooele Scholar</a>
+                        <a href="https://translate.google.cn/" class="item">Google Translate</a>
+                        <a href="http://www.cnki.net/" class="item">中国知网</a>
+                    </div>
+                </div>
+                <div class="four wide column">
+                    <h4 class="ui header">资源导航</h4>
+                    <div class="ui link list">
+                        <a href="http://mirrors.zju.edu.cn/#list" class="item">浙江大学开源镜像站</a>
+                        <a href="https://www.jiumodiary.com/" class="item">Jiumo E-Book Search</a>
+                        <a href="http://www.nexushd.org/index.php" class="item">NexusHD</a>
+                        <a href="ftp://software.cc98.org/" class="item">CC98资源站</a>
+                    </div>
+                </div>
+            </div>
+            <div class="ui inverted section divider"></div>
+            <h4>浙江大学2015级软件需求工程、软件工程管理G04课程组开发</h4>
+        </div>
+    </div>
+</body>
+
+</html>

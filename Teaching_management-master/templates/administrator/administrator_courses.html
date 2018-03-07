@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0"> {% load staticfiles %}
+    <title>课程管理中心</title>
+    <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'Semantic-UI-master/dist/semantic.min.css' %}">
+    <script type="text/javascript" src="{% static 'Semantic-UI-master/dist/semantic.min.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+            //tab切换脚本
+            $('.ui .item[data-tab]').on('click', function() {
+                $('.ui .item[data-tab]').removeClass('active');
+                $(this).addClass('active');
+                var tab = $(this).attr("data-tab");
+                $(".tab").removeClass("active");
+                $(".tab[data-tab=\"" + tab + "\"]").addClass("active");
+            });
+        });
+
+        //隐藏模态层
+        function HideModal() {
+            $('.ui .modal').modal('hide');
+        }
+
+        //添加班级
+        function add_class() {
+
+        }
+
+        //查看对应课程信息
+        function look() {
+
+        }
+
+        //是否删除班级
+        function if_del_class() {
+            $('#del_class').modal('setting', 'closable', false).modal('show');
+        }
+
+        //确认删除班级
+        function confirm_del_class() {
+            alert('删除班级成功');
+            HideModal();
+        }
+
+        //添加教师
+        function add_teacher() {
+
+        }
+
+        //是否删除教师
+        function if_del_teacher() {
+            $('#del_teacher').modal('setting', 'closable', false).modal('show');
+        }
+
+        //确定删除教师
+        function confirm_del_teacher() {
+            alert('删除成功');
+            HideModal();
+        }
+
+        //添加学生
+        function add_student() {
+
+        }
+
+        //是否删除学生
+        function if_del_student() {
+            $('#del_student').modal('setting', 'closable', false).modal('show');
+        }
+
+        //确定删除学生
+        function confirm_del_student() {
+            alert('删除成功');
+            HideModal();
+        }
+    </script>
+</head>
+
+<body>
+    <div class="pusher" id="pusher">
+        <!--顶部-->
+        <div class="ui container" style="width: 62%;margin-top: 10px">
+            <div class="ui items">
+                <div class="item">
+                    <a class="ui tiny image" href="/administrator">
+                        <img src="{% static 'img/zju4.jpg' %}">
+                    </a>
+                    <div class="middle aligned content">
+                        <a class="header">浙江大学教学服务系统管理中心</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ui hidden divider"></div>
+        <!--菜单栏-->
+        <div class="ui vertical masthead center aligned">
+            <div class="ui container" style="width: 63%">
+                <div class="ui attached small red visible menu">
+                    <a class="active item" data-tab="info_list" id="info_tab">课程信息</a>
+                    <a class="item" data-tab="course_list" id="course_tab">开课信息</a>
+                    <a class="item" data-tab="teacher_list" id="teacher_tab">教师列表</a>
+                    <a class="item" data-tab="student_list" id="student_tab">学生列表</a>
+                    <div class="right menu">
+                        <div class="ui action input">
+                            <input class="prompt" type="text" placeholder="搜索课程或教师">
+                            <button class="ui icon button">
+                            <i class="search icon"></i>
+                        </button>
+                        </div>
+                    </div>
+                    <a class="item" href="/administrater">返回</a>
+                    <a class="item" href="logout">退出</a>
+                </div>
+            </div>
+        </div>
+        <!--课程信息-->
+        <div class="ui bottom attached active tab" data-tab="info_list" style="min-height: 590px;">
+            <div class="ui container">
+                <div class="ui hidden divider"></div>
+                <table class="ui celled striped table" style="width: 600px;">
+                    <tbody>
+                        <tr>
+                            <td>课程号</td>
+                            <td>{{ CourseInfo.0 }}</td>
+                        </tr>
+                        <tr>
+                            <td>课程名</td>
+                            <td>{{ CourseInfo.1 }}</td>
+                        </tr>
+                        <tr>
+                            <td>开课学院</td>
+                            <td>{{ CourseInfo.2 }}</td>
+                        </tr>
+                        <tr>
+                            <td>开班数</td>
+                            <td>{{ CourseInfo.3 }}</td>
+                        </tr>
+                        <tr>
+                            <td>本班教师</td>
+                            <td>{{ CourseInfo.4 }}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="ui form">
+                    <button class="ui button" onclick="add_class()">添加班级</button>
+                </div>
+            </div>
+            <div class="ui hidden divider"></div>
+        </div>
+        <!--开班信息-->
+        <div class="ui bottom attached tab" data-tab="course_list" style="min-height: 590px;">
+            <div class="ui container">
+                <div class="ui hidden divider"></div>
+
+                <table class="ui celled striped table" id="info">
+                    <thead>
+                        <tr>
+                            <th>教师</th>
+                            <th>学期</th>
+                            <th>上课时间</th>
+                            <th>上课地点</th>
+                            <th>考试时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="info_table">
+                        {% for foo in CoursesList %}
+                        <tr>
+                            <td>
+                                {% for i in foo.0 %}
+                                <p>{{ i }}</p>
+                                {% endfor %}
+                            </td>
+                            <td>{{ foo.1 }}</td>
+                            <td>
+                                {% for i in foo.2 %}
+                                <p>{{ i }}</p>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for i in foo.3 %}
+                                <p>{{ i }}</p>
+                                {% endfor %}
+                            </td>
+                            <td>{{ foo.4 }}</td>
+                            <td class="collapsing">
+                                <div class="ui button" onclick="look()">查看</div>
+                                <div class="ui button" onclick="if_del_class()">删除</div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="ui form">
+                    <button class="ui button" onclick="add_class()">添加班级</button>
+                </div>
+            </div>
+            <div class="ui hidden divider"></div>
+        </div>
+        <!--教师列表-->
+        <div class="ui bottom attached tab" data-tab="teacher_list" style="min-height: 590px;">
+            <div class="ui container">
+                <div class="ui hidden divider"></div>
+                <table class="ui celled striped table" id="teacher_list">
+                    <thead>
+                        <tr>
+                            <th>教工号</th>
+                            <th>姓名</th>
+                            <th>职称</th>
+                            <th>学院</th>
+                            <th>电子邮箱</th>
+                            <th>联系方式</th>
+                            <th>删除</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teacher_list">
+                        {% for foo in TeacherList %}
+                        <tr>
+                            <td>{{ foo.0 }}</td>
+                            <td>{{ foo.1 }}</td>
+                            <td>{{ foo.2 }}</td>
+                            <td>{{ foo.3 }}</td>
+                            <td>{{ foo.4 }}</td>
+                            <td>{{ foo.5 }}</td>
+                            <td class="collapsing">
+                                <div class="ui button" onclick="if_del_teacher()">删除</div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="ui form">
+                    <button class="ui button" onclick="add_teacher()">添加教师</button>
+                </div>
+            </div>
+            <div class="ui hidden divider"></div>
+        </div>
+        <!--学生列表-->
+        <div class="ui bottom attached tab" data-tab="student_list" style="min-height: 590px;">
+            <div class="ui container">
+                <div class="ui hidden divider"></div>
+                <div class="ui form">
+                    <button class="ui button" onclick="add_student()">添加学生</button>
+                </div>
+                <table class="ui celled striped table" id="teacher_list">
+                    <thead>
+                        <tr>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>年级</th>
+                            <th>学院</th>
+                            <th>专业</th>
+                            <th>电子邮箱</th>
+                            <th>联系方式</th>
+                            <th>删除</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student_list">
+                        {% for foo in StudentList %}
+                        <tr>
+                            <td>{{ foo.0 }}</td>
+                            <td>{{ foo.1 }}</td>
+                            <td>{{ foo.2 }}级</td>
+                            <td>{{ foo.3 }}</td>
+                            <td>{{ foo.4 }}</td>
+                            <td>{{ foo.5 }}</td>
+                            <td>{{ foo.6 }}</td>
+                            <td class="collapsing ">
+                                <div class="ui button " onclick="if_del_student() ">删除</div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="ui hidden divider "></div>
+        </div>
+        <!--底部友情链接-->
+        <div class="ui footer basic segment " style="background-color: #E0E0E0; ">
+            <div class="ui center aligned container ">
+                <div class="ui stackable divided equal height stackable grid ">
+                    <div class="five wide column ">
+                        <h4 class="ui header ">友情链接</h4>
+                        <div class="ui link list ">
+                            <a href="http://www.zju.edu.cn " class="item ">浙江大学官方网站</a>
+                            <a href="http://jwbinfosys.zju.edu.cn/default2.aspx " class="item ">浙江大学现代教务管理系统</a>
+                            <a href="http://www.cs.zju.edu.cn/ " class="item ">浙江大学计算机科学与技术学院</a>
+                            <a href="http://www.cc98.org/ " class="item ">CC98论坛</a>
+                        </div>
+                    </div>
+                    <div class="five wide column ">
+                        <h4 class="ui header ">常用网站导航</h4>
+                        <div class="ui link list ">
+                            <a href="https://github.com/ " class="item ">GitHub</a>
+                            <a href="https://scholar.google.com/ " class="item ">Gooele Scholar</a>
+                            <a href="https://translate.google.cn/ " class="item ">Google Translate</a>
+                            <a href="http://www.cnki.net/ " class="item ">中国知网</a>
+                        </div>
+                    </div>
+                    <div class="four wide column ">
+                        <h4 class="ui header ">资源导航</h4>
+                        <div class="ui link list ">
+                            <a href="http://mirrors.zju.edu.cn/#list " class="item ">浙江大学开源镜像站</a>
+                            <a href="https://www.jiumodiary.com/ " class="item ">Jiumo E-Book Search</a>
+                            <a href="http://www.nexushd.org/index.php " class="item ">NexusHD</a>
+                            <a href="ftp://software.cc98.org/ " class="item ">CC98资源站</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui inverted section divider "></div>
+                <h4>浙江大学2015级软件需求工程、软件工程管理G04课程组开发</h4>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="ui small basic modal " id="del_class ">
+        <i class="close icon "></i>
+        <div class="header ">
+            您确定要删除此班级吗？（注意：此操作不可逆!)
+        </div>
+        <div class="actions ">
+            <div class="ui red button " onclick="confirm_del_class() ">
+                确定
+            </div>
+            <div class="ui green button " onclick="HideModal() ">
+                取消
+            </div>
+        </div>
+    </div>
+
+    <div class="ui small basic modal " id="del_teacher ">
+        <i class="close icon "></i>
+        <div class="header ">
+            您确定要删除此教师吗？（注意：此操作不可逆!)
+        </div>
+        <div class="actions ">
+            <div class="ui red button " onclick="confirm_del_teacher() ">
+                确定
+            </div>
+            <div class="ui green button " onclick="HideModal() ">
+                取消
+            </div>
+        </div>
+    </div>
+    <div class="ui small basic modal " id="del_student ">
+        <i class="close icon "></i>
+        <div class="header ">
+            您确定要删除此学生吗？（注意：此操作不可逆!)
+        </div>
+        <div class="actions ">
+            <div class="ui red button " onclick="confirm_del_student() ">
+                确定
+            </div>
+            <div class="ui green button " onclick="HideModal() ">
+                取消
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

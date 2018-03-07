@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8"> {% load staticfiles %}
+    <title>教学服务系统</title>
+    <!-- 使用本地的样式与js文件 -->
+    <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap-4.0.0-alpha.6-dist/js/bootstrap.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'Semantic-UI-master/dist/semantic.min.css' %}">
+    <script type="text/javascript" src="{% static 'Semantic-UI-master/dist/semantic.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/tab.css' %}">
+    <link rel="stylesheet" href="{% static 'css/pagination.css' %}">
+    <script>
+        $(document).ready(function() {
+            $('.ui .item[data-tab]').on('click', function() {
+                $('.ui .item[data-tab]').removeClass('active');
+                $(this).addClass('active');
+                var tab = $(this).attr("data-tab");
+                $(".tab").removeClass("active");
+                $(".tab[data-tab=\"" + tab + "\"]").addClass("active");
+                var second_item = document.getElementById('second_item');
+                second_item.innerHTML = trans(tab);
+            });
+            $('.sidebar').sidebar({
+                dimPage: false,
+                closable: false
+            });
+            //处理bootstrap的tab点击，有bug
+            $('[data-toggle="tab"]').click(function() {
+                $('[data-toggle="tab"]').removeClass('active');
+            })
+        });
+
+        //通过button的value来定位对应的modal的id，实现modal.show
+        function showModal(e) {
+            $("#" + e.value).modal('show');
+            $(e).parent().removeClass('red');
+        }
+
+        //隐藏模态层
+        function HideModal() {
+            $('.ui .modal').modal('hide');
+        }
+
+        //显示侧边栏
+        function show_left() {
+            var left_sidebar = $("#left_sidebar");
+            left_sidebar.sidebar('toggle');
+            $('#pusher').attr('style', 'margin-left: 182px');
+            $('#menu1').attr('onclick', 'hide_left()');
+        }
+
+        //隐藏侧边栏
+        function hide_left() {
+            $('#left_sidebar').sidebar('hide');
+            $('#pusher').attr('style', '');
+            $('#menu1').attr('onclick', 'show_left()');
+        }
+
+        //转换tab为中文名
+        function trans(tab) {
+            if (tab === 'syllabus')
+                return '课程大纲';
+            else if (tab === 'homework')
+                return '课程作业';
+            else if (tab === 'message')
+                return '课程通知';
+            else if (tab === 'teacher_list')
+                return '教师信息';
+            else if (tab === 'forum')
+                return '课程论坛';
+            else if (tab === 'resources')
+                return '课程资源';
+            else
+                return false;
+        }
+    </script>
+    <script>
+        //初始化课程大纲页面
+        function init_syllabus() {
+            //以下部分初始化课程简介
+            var summary = '这门课程叫软件需求工程'; //简介内容从后台获得
+            var p = document.createElement('p'); //创建段落标签
+            var div_summary = document.getElementById('summary'); //获得课程简介div的id
+            div_summary.appendChild(p); //将段落加入课程简介div中
+            p.innerHTML = summary;
+            $('#modify_summary').val(summary);
+            //以下部分初始化课程日历
+            var arrangement_td = {{ time|safe }}; //表格每栏的内容，从后台获取
+            
+            var tbody = document.getElementById('calendars'); //tbody标签
+            var tr; //表格tr标签
+            var td = []; //表格td标签
+            for (var i = 0; i < 10; i++) { //此处设置安排为10条，实际要从后台获得
+                tr = document.createElement('tr');
+                tbody.appendChild(tr); //创建tr标签并加入tbody中
+                for (var j = 0; j < 4; j++) {
+                    td[j] = document.createElement('td');
+                    td[j].innerHTML = arrangement_td[i][j];
+                    tr.appendChild(td[j]); //创建四个td标签并加入tr中
+                }
+                td[0].className = 'collapsing';
+                td[1].className = 'collapsing';
+                td[3].className = 'right aligned collapsing'; //设置第0、1、3个td的class*/
+            }
+        }
+
+        //判断要加载的tab
+        function switch_tab() {
+            var tab = location.search.slice(1);
+            $('.ui .item[data-tab]').removeClass('active');
+            $('.tab').removeClass("active");
+            var second_item = document.getElementById('second_item');
+            if (tab === '2') {
+                $('.ui .item[data-tab=homework]').addClass('active');
+                $('.tab[data-tab=homework]').addClass('active');
+                second_item.innerHTML = '课程作业';
+            } else if (tab === '3') {
+                $('.ui .item[data-tab=message]').addClass('active');
+                $('.tab[data-tab=message]').addClass('active');
+                second_item.innerHTML = '课程通知';
+            } else if (tab === '4') {
+                $('.ui .item[data-tab=teacher_list]').addClass('active');
+                $('.tab[data-tab=teacher_list]').addClass('active');
+                second_item.innerHTML = '教师信息';
+            } else if (tab === '5') {
+                $('.ui .item[data-tab=forum]').addClass('active');
+                $('.tab[data-tab=forum]').addClass('active');
+                second_item.innerHTML = '课程论坛';
+            } else if (tab === '6') {
+                $('.ui .item[data-tab=resources]').addClass('active');
+                $('.tab[data-tab=resources]').addClass('active');
+                second_item.innerHTML = '课程资源';
+            } else {
+                $('.ui .item[data-tab=syllabus]').addClass('active');
+                $('.tab[data-tab=syllabus]').addClass('active');
+                second_item.innerHTML = '课程大纲';
+            }
+        }
+
+        //发布新贴
+        function new_post() {
+            var topic = document.getElementById('new_topic').value;
+            var content = document.getElementById('new_content').value;
+            if (topic.trim() === '') {
+                alert('主题不可为空！');
+                return false;
+            }
+            if (content.trim() === '') {
+                alert('内容不可为空！');
+                return false;
+            }
+            //将数据传到数据库中
+            //......
+            alert('主题发布成功！');
+            window.location.reload();
+        }
+
+        //翻页
+        function fanye(page) {
+            $.ajax({
+                type: "get",
+                dataType: "json",
+                url: "index",
+                data: {
+                    page: page
+                },
+                success: function(msg) {
+
+                }
+            })
+        }
+
+        //上传资源
+        function shangchuan() {
+
+        }
+
+        //发送私信
+        function send_mesage() {
+            window.location.href = '/student/message/3/';
+        }
+    </script>
+</head>
+
+<body onload="init_syllabus();switch_tab()">
+    <!--左侧菜单栏-->
+    <div style="background-color: #E0E0E0;" class="ui visible left overlay vertical small sidebar menu" id="left_sidebar">
+        <div class="ui container">
+            <a class="active item" data-tab="syllabus">
+                <i class="home icon"></i>课程大纲
+            </a>
+            <a class="item" data-tab="homework">
+                <i class="file text outline icon"></i>
+                <div class="ui red label">{{ unsubmitHw }}</div>
+                课程作业</a>
+            <a class="item" data-tab="message">
+                <i class="announcement icon"></i>
+                <div class="ui red label">{{ unreadNotice }}</div>
+                课程通知
+            </a>
+            <a class="item" data-tab="teacher_list">
+                <i class="users icon"></i>教师信息</a>
+            <a class="item" data-tab="forum">
+                <i class="comments outline icon"></i>课程论坛</a>
+            <a class="item" data-tab="resources">
+                <i class="folder open outline icon"></i>课程资源</a>
+            <a class="item" data-tab="return" onclick="window.location.href='/student'">
+                <i class="reply icon"></i>返回个人主页</a>
+            <a class="item" data-tab="logout" onclick="window.location.href='logout'">
+                <i class="sign out icon"></i>退出系统</a>
+        </div>
+    </div>
+
+    <div class="pusher" id="pusher" style="margin-left: 182px;">
+        <!--顶部-->
+        <div class="ui container" style="width: 90%;margin-top: 10px">
+            <div class="ui items">
+                <div class="item">
+                    <a class="ui tiny image">
+                        <img src="{% static 'img/zju4.jpg' %}">
+                    </a>
+                    <div class="middle aligned content">
+                        <a class="header">欢迎使用浙江大学教学服务系统</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--顶部菜单栏-->
+        <div class="ui vertical masthead center aligned segment">
+            <div class="ui container" style="width: 91%">
+                <div class="ui secondary small breadcrumb borderless visible menu">
+                    <a class="item" onclick="hide_left()" id="menu1">
+                    软件需求工程
+                    <span>
+                            <i class="right chevron icon divider"></i>
+                        </span>
+                </a>
+                    <a class="item" id="second_item"></a>
+                    <div class="right menu">
+                        <div class="ui action input">
+                            <select class="ui compact selection dropdown">
+                            <option selected="" value="courses">课程</option>
+                            <option value="teachers">教师</option>
+                        </select>
+                            <input class="prompt" type="text" placeholder="搜索课程或教师">
+                            <button class="ui icon button">
+                            <i class="search icon"></i>
+                        </button>
+                        </div>
+                    </div>
+                    <a class="item" href="/student/logout">退出</a>
+                </div>
+            </div>
+        </div>
+        <div class="ui hidden divider"></div>
+        <!--课程大纲tab-->
+        <div class="ui bottom attached active tab" data-tab="syllabus" style="min-height: 568px">
+            <div class="ui container">
+                <div class="ui segment" id="summary">
+                    <h2>课程简介</h2>
+                </div>
+
+                <table class="ui celled striped table" id="calendars_table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>时间</th>
+                            <th>安排</th>
+                            <th>地点</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calendars">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!--课程作业tab-->
+        <div class="ui bottom attached tab" data-tab="homework" style="min-height: 571px">
+            <div class="ui container">
+                {% for foo in HwList %} {% ifequal foo.0 '0' %}
+                <div class="ui icon red message">
+                    <i class="inbox icon"></i>
+                    <div class="content">
+                        <div class="header">{{ foo.1 }}</div>
+                        <p>{{ foo.2 }}</p>
+                    </div>
+                    <button class="ui button" onclick="window.location.href='/student/student_hw/{{ foo.3}}'">详情</button>
+                </div>
+                {% else %}
+                <div class="ui icon message">
+                    <i class="inbox icon"></i>
+                    <div class="content">
+                        <div class="header">{{ foo.1 }}</div>
+                        <p>{{ foo.2 }}</p>
+                    </div>
+                    <button class="ui button" onclick="window.location.href='/student/student_hw/{{ foo.3}}'">详情</button>
+                </div>
+                {% endifequal %} {% endfor %}
+            </div>
+        </div>
+        <!--课程通知tab-->
+        <div class="ui bottom attached tab" data-tab="message" style="min-height: 571px">
+            <div class="ui container">
+                {% for i in NoticeList %} {% ifequal i.0 '0' %}
+                <div class="ui icon red message">
+                    <i class="inbox icon"></i>
+                    <div class="content">
+                        <div class="header">{{ i.1 }}</div>
+                        <p>{{ i.2 }}</p>
+                    </div>
+                    <button class="ui button" value="notice{{ forloop.counter0 }}" onclick="showModal(this)">详情</button>
+                </div>
+                {% else %}
+                <div class="ui icon message">
+                    <i class="inbox icon"></i>
+                    <div class="content">
+                        <div class="header">{{ i.1 }}</div>
+                        <p>{{ i.2 }}</p>
+                    </div>
+                    <button class="ui button" value="notice{{ forloop.counter0 }}" onclick="showModal(this)">详情</button>
+                </div>
+                {% endifequal %}
+                <div class="ui test modal" id="notice{{ forloop.counter0 }}">
+                    <i class="close icon"></i>
+                    <div class="header">{{ i.1 }}</div>
+                    <div class="content">
+                        <div class="right">
+                            <div class="ui header">{{ i.3 }}</div>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <div class="ui black button" onclick="HideModal()">
+                            关闭
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!--教师列表tab-->
+        <div class="ui bottom attached tab" data-tab="teacher_list" style="min-height: 595px">
+            <div class="ui container">
+                <div class="ui cards">
+                    {% for foo in TeacherList %}
+                    <div class="card">
+                        <div class="content">
+                            <img class="right floated mini ui image" src="{% static 'Semantic-UI-master/examples/assets/images/avatar/tom.jpg' %}">
+                            <div class="header">{{ foo.0 }}</div>
+                            <div class="meta">{{ foo.1 }}</div>
+                            <div class="description">{{ foo.2 }}</div>
+                        </div>
+                        <div class="extra content">
+                            <div class="ui two buttons">
+                                <button class="ui basic green button" value="teacher{{ forloop.counter0 }}" onclick="showModal(this)">详细信息
+                                </button>
+                                <button class="ui basic blue button" onclick="send_mesage()">发送私信</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui test modal" id="teacher{{ forloop.counter0 }}">
+                        <i class="close icon"></i>
+                        <div class="header">{{ foo.0 }}老师的详细信息</div>
+                        <div class="content">
+                            <table class="ui celled padded selectable table segment">
+                                <tbody>
+                                    <tr>
+                                        <td>姓名</td>
+                                        <td>{{ foo.0 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="collapsing">学院</td>
+                                        <td>{{ foo.2 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="collapsing">职称</td>
+                                        <td>{{ foo.1 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="collapsing">电子邮箱</td>
+                                        <td>{{ foo.3 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="collapsing">联系方式</td>
+                                        <td>{{ foo.4 }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="actions">
+                            <div class="ui black button" onclick="HideModal()">
+                                关闭
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!--论坛tab-->
+        <div class="ui bottom attached tab" data-tab="forum" style="min-height: 571px">
+            <div class="ui container" style="width: 70%;">
+                <div class="tab-pane fade in active">
+                    <div class="tab-content">
+                        {% for foo in PostPaginator %} {% ifequal forloop.counter0 0 %}
+                        <div class="tab-pane fade in active" id="post{{ forloop.counter0 }}">
+                            <table class="ui large selectable celled striped table">
+                                <thead>
+                                    <tr>
+                                        <th>主题</th>
+                                        <th>发贴人</th>
+                                        <th>发贴时间</th>
+                                        <th>最后回复人</th>
+                                        <th>最后回复时间</th>
+                                        <th>总回复数</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in foo|slice:":1" %} {% for element in i %}
+                                    <tr id="pos{{ forloop.counter0 }}">
+                                        <td>
+                                            <a href="/student/student_forum/1/">{{ element.0 }}</a>
+                                        </td>
+                                        <td>{{ element.1 }}</td>
+                                        <td>{{ element.2 }}</td>
+                                        <td>{{ element.3 }}</td>
+                                        <td>{{ element.4 }}</td>
+                                        <td>{{ element.5 }}</td>
+                                    </tr>
+                                    {% endfor %} {% endfor %}
+                                </tbody>
+                            </table>
+
+                        </div>
+                        {% else %}
+                        <div class="tab-pane fade" id="post{{ forloop.counter0 }}">
+                            <table class="ui large selectable celled striped table">
+                                <thead>
+                                    <tr>
+                                        <th>主题</th>
+                                        <th>发贴人</th>
+                                        <th>发贴时间</th>
+                                        <th>最后回复人</th>
+                                        <th>最后回复时间</th>
+                                        <th>总回复数</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in foo|slice:":1" %} {% for element in i %}
+                                    <tr id="post{{ forloop.counter0 }}">
+                                        <td>
+                                            <a href="student_forum.html">{{ element.0 }}</a>
+                                        </td>
+                                        <td>{{ element.1 }}</td>
+                                        <td>{{ element.2 }}</td>
+                                        <td>{{ element.3 }}</td>
+                                        <td>{{ element.4 }}</td>
+                                        <td>{{ element.5 }}</td>
+                                    </tr>
+                                    {% endfor %} {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endifequal %} {% endfor %}
+                    </div>
+                    <div class="ui hidden divider"></div>
+                    <div class="ui right floated pagination menu">
+                        {% for foo in PostPage.page_range %}
+                        <a data-toggle="tab" class="item" href="#post{{ forloop.counter0 }}">{{ foo }}</a> {% endfor %}
+                    </div>
+                    <div class="ui hidden divider"></div>
+                    <div class="ui form">
+                        <div class="field">
+                            <label>主题</label>
+                            <textarea rows="1" id="new_topic"></textarea>
+                        </div>
+                        <div class="field">
+                            <label>内容</label>
+                            <textarea rows="8" id="new_content"></textarea>
+                        </div>
+                        <button class="ui button" onclick="new_post()">发布</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--课程资源tab-->
+        <div class="ui bottom attached tab" data-tab="resources" style="min-height: 571px">
+            <div class="ui container" style="width: 70%;">
+                <ul id="myTab" class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#ppt" class="active" data-toggle="tab">PPT资源</a>
+                    </li>
+                    <li>
+                        <a href="#pdf" data-toggle="tab">PDF资源</a>
+                    </li>
+                    <li>
+                        <a href="#media" data-toggle="tab">视频资源</a>
+                    </li>
+                    <li>
+                        <a href="#others" data-toggle="tab">其他资源</a>
+                    </li>
+                </ul>
+                <div id="myTabContent" class="tab-content">
+                    <div class="tab-pane fade in active" id="ppt">
+                        <div class="tab-content">
+                            {% for foo in PPTPaginator %} {% ifequal forloop.counter0 0 %}
+                            <div class="tab-pane fade in active" id="ppt{{ forloop.counter0 }}">
+                                <table class="ui selectable celled striped table">
+                                    <thead>
+                                        <tr>
+                                            <th>上传时间</th>
+                                            <th class="one wide">上传者</th>
+                                            <th>文件名</th>
+                                            <th>下载</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in foo|slice:":1" %} {% for j in i %}
+                                        <tr>
+                                            <td class="collapsing">{{ j.2 }}</td>
+                                            <td class="collapsing">{{ j.1 }}</td>
+                                            <td><a href="/student/student_resource_comment">{{ j.0 }}</a></td>
+                                            <td class="right allgn collapsing">
+                                                <button class="ui button">下载</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %} {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="tab-pane fade in" id="ppt{{ forloop.counter0 }}">
+                                <table class="ui selectable celled striped table">
+                                    <thead>
+                                        <tr>
+                                            <th>上传时间</th>
+                                            <th class="one wide">上传者</th>
+                                            <th>文件名</th>
+                                            <th>下载</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in foo|slice:":1" %} {% for j in i %}
+                                        <tr>
+                                            <td class="collapsing">{{ j.2 }}</td>
+                                            <td class="collapsing">{{ j.1 }}</td>
+                                            <td><a href="student_resource_comment">{{ j.0 }}</a></td>
+                                            <td class="right allgn collapsing">
+                                                <button class="ui button">下载</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %} {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% endifequal %} {% endfor %}
+                        </div>
+                        <div class="ui hidden divider"></div>
+                        <div class="ui right floated pagination menu">
+                            {% for foo in PPTPage.page_range %}
+                            <a data-toggle="tab" class="item" href="#ppt{{ forloop.counter0 }}">{{ foo }}</a> {% endfor %}
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="pdf">
+                        <div class="tab-content">
+                            {% for foo in PDFPaginator %} {% ifequal forloop.counter0 0 %}
+                            <div class="tab-pane fade in active" id="pdf{{ forloop.counter0 }}">
+                                <table class="ui selectable celled striped table">
+                                    <thead>
+                                        <tr>
+                                            <th>上传时间</th>
+                                            <th class="one wide">上传者</th>
+                                            <th>文件名</th>
+                                            <th>下载</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in foo|slice:":1" %} {% for j in i %}
+                                        <tr>
+                                            <td class="collapsing">{{ j.2 }}</td>
+                                            <td class="collapsing">{{ j.1 }}</td>
+                                            <td><a href="student_resource_comment">{{ j.0 }}</a></td>
+                                            <td class="right allgn collapsing">
+                                                <button class="ui button">下载</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %} {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="tab-pane fade in" id="pdf{{ forloop.counter0 }}">
+                                <table class="ui selectable celled striped table">
+                                    <thead>
+                                        <tr>
+                                            <th>上传时间</th>
+                                            <th class="one wide">上传者</th>
+                                            <th>文件名</th>
+                                            <th>下载</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in foo|slice:":1" %} {% for j in i %}
+                                        <tr>
+                                            <td class="collapsing">{{ j.2 }}</td>
+                                            <td class="collapsing">{{ j.1 }}</td>
+                                            <td><a href="student_resource_comment">{{ j.0 }}</a></td>
+                                            <td class="right allgn collapsing">
+                                                <button class="ui button">下载</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %} {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% endifequal %} {% endfor %}
+                        </div>
+                        <div class="ui hidden divider"></div>
+                        <div class="ui right floated pagination menu">
+                            {% for foo in PPTPage.page_range %}
+                            <a data-toggle="tab" class="item" href="#pdf{{ forloop.counter0 }}">{{ foo }}</a> {% endfor %}
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="media">
+                        <div class="tab-content">
+                            {% for foo in MediaPaginator %} {% ifequal forloop.counter0 0 %}
+                            <div class="tab-pane fade in active" id="media{{ forloop.counter0 }}">
+                                <table class="ui selectable celled striped table">
+                                    <thead>
+                                        <tr>
+                                            <th>上传时间</th>
+                                            <th class="one wide">上传者</th>
+                                            <th>文件名</th>
+                                            <th>下载</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in foo|slice:":1" %} {% for j in i %}
+                                        <tr>
+                                            <td class="collapsing">{{ j.2 }}</td>
+                                            <td class="collapsing">{{ j.1 }}</td>
+                                            <td><a href="student_resource_comment">{{ j.0 }}</a></td>
+                                            <td class="right allgn collapsing">
+                                                <button class="ui button">下载</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %} {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="tab-pane fade in" id="media{{ forloop.counter0 }}">
+                                <table class="ui selectable celled striped table">
+                                    <thead>
+                                        <tr>
+                                            <th>上传时间</th>
+                                            <th class="one wide">上传者</th>
+                                            <th>文件名</th>
+                                            <th>下载</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in foo|slice:":1" %} {% for j in i %}
+                                        <tr>
+                                            <td class="collapsing">{{ j.2 }}</td>
+                                            <td class="collapsing">{{ j.1 }}</td>
+                                            <td><a href="student_resource_comment">{{ j.0 }}</a></td>
+                                            <td class="right allgn collapsing">
+                                                <button class="ui button">下载</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %} {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% endifequal %} {% endfor %}
+                        </div>
+                        <div class="ui hidden divider"></div>
+                        <div class="ui right floated pagination menu">
+                            {% for foo in MediaPage.page_range %}
+                            <a data-toggle="tab" class="item" href="#media{{ forloop.counter0 }}">{{ foo }}</a> {% endfor %}
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="others">
+                        <div class="tab-content">
+                            {% for foo in OthersPaginator %} {% ifequal forloop.counter0 0 %}
+                            <div class="tab-pane fade in active" id="others{{ forloop.counter0 }}">
+                                <table class="ui selectable celled striped table">
+                                    <thead>
+                                        <tr>
+                                            <th>上传时间</th>
+                                            <th class="one wide">上传者</th>
+                                            <th>文件名</th>
+                                            <th>下载</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in foo|slice:":1" %} {% for j in i %}
+                                        <tr>
+                                            <td class="collapsing">{{ j.2 }}</td>
+                                            <td class="collapsing">{{ j.1 }}</td>
+                                            <td><a href="student_resource_comment">{{ j.0 }}</a></td>
+                                            <td class="right allgn collapsing">
+                                                <button class="ui button">下载</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %} {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="tab-pane fade in" id="others{{ forloop.counter0 }}">
+                                <table class="ui selectable celled striped table">
+                                    <thead>
+                                        <tr>
+                                            <th>上传时间</th>
+                                            <th class="one wide">上传者</th>
+                                            <th>文件名</th>
+                                            <th>下载</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in foo|slice:":1" %} {% for j in i %}
+                                        <tr>
+                                            <td class="collapsing">{{ j.2 }}</td>
+                                            <td class="collapsing">{{ j.1 }}</td>
+                                            <td><a href="student_resource_comment">{{ j.0 }}</a></td>
+                                            <td class="right allgn collapsing">
+                                                <button class="ui button">下载</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %} {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% endifequal %} {% endfor %}
+                        </div>
+                        <div class="ui hidden divider"></div>
+                        <div class="ui right floated pagination menu">
+                            {% for foo in OthersPage.page_range %}
+                            <a data-toggle="tab" class="item" href="#others{{ forloop.counter0 }}">{{ foo }}</a> {% endfor %}
+                        </div>
+                    </div>
+                    <button class="ui left floated blue button" onclick="shangchuan()">上传</button>
+                </div>
+
+            </div>
+        </div>
+        <!--底部友情链接-->
+        <div class="ui footer basic segment" style="background-color: #E0E0E0;">
+            <div class="ui center aligned container">
+                <div class="ui stackable divided equal height stackable grid">
+                    <div class="five wide column">
+                        <h4 class="ui header">友情链接</h4>
+                        <div class="ui link list">
+                            <a href="http://www.zju.edu.cn" class="item">浙江大学官方网站</a>
+                            <a href="http://jwbinfosys.zju.edu.cn/default2.aspx" class="item">浙江大学现代教务管理系统</a>
+                            <a href="http://www.cs.zju.edu.cn/" class="item">浙江大学计算机科学与技术学院</a>
+                            <a href="http://www.cc98.org/" class="item">CC98论坛</a>
+                        </div>
+                    </div>
+                    <div class="five wide column">
+                        <h4 class="ui header">常用网站导航</h4>
+                        <div class="ui link list">
+                            <a href="https://github.com/" class="item">GitHub</a>
+                            <a href="https://scholar.google.com/" class="item">Gooele Scholar</a>
+                            <a href="https://translate.google.cn/" class="item">Google Translate</a>
+                            <a href="http://www.cnki.net/" class="item">中国知网</a>
+                        </div>
+                    </div>
+                    <div class="four wide column">
+                        <h4 class="ui header">资源导航</h4>
+                        <div class="ui link list">
+                            <a href="http://mirrors.zju.edu.cn/#list" class="item">浙江大学开源镜像站</a>
+                            <a href="https://www.jiumodiary.com/" class="item">Jiumo E-Book Search</a>
+                            <a href="http://www.nexushd.org/index.php" class="item">NexusHD</a>
+                            <a href="ftp://software.cc98.org/" class="item">CC98资源站</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui inverted section divider"></div>
+                <h4>浙江大学2015级软件需求工程、软件工程管理G04课程组开发</h4>
+            </div>
+        </div>
+    </div>
+
+    <!--modal-->
+    <div class="ui test modal" id="m1">
+        <i class="close icon"></i>
+        <div class="header">
+            操作系统课程通知
+        </div>
+        <div class="content">
+            <div class="right">
+                <div class="ui header">作业5已经发布，ddl为本周日晚上12点，请大家尽快完成</div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui black button" onclick="HideModal()">
+                关闭
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

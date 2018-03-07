@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0"> {% load staticfiles %}
+    <title>浙江大学教学服务系统</title>
+    <!-- 使用本地的样式与js文件 -->
+    <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'Semantic-UI-master/dist/semantic.min.css' %}">
+    <script type="text/javascript" src="{% static 'Semantic-UI-master/dist/semantic.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'bootstrap-4.0.0-alpha.6-dist/css/bootstrap.min.css' %}">
+    <link href="{% static 'bootstrap-fileinput-master/css/fileinput.min.css' %}" rel="stylesheet" type="text/css" />
+    <script src="{% static 'bootstrap-4.0.0-alpha.6-dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/fileinput.min.js' %}"></script>
+    <script src="{% static 'bootstrap-fileinput-master/themes/fa/theme.js' %}"></script>
+
+    <!--tab切换脚本-->
+    <script>
+        $(document).ready(function() {
+            $('.ui .item[data-tab]').on('click', function() {
+                $('.ui .item[data-tab]').removeClass('active');
+                $(this).addClass('active');
+                var tab = $(this).attr("data-tab");
+                $(".tab").removeClass("active");
+                $(".tab[data-tab=\"" + tab + "\"]").addClass("active");
+            });
+            $('.ui .dropdown').dropdown();
+        });
+
+        //通过button的value来定位对应的modal的id，实现modal.show
+        function showModal(e) {
+            $("#" + e.value).modal('show');
+        }
+    </script>
+    <!--初始化与修改函数-->
+    <script>
+        //初始化作业
+        function init() {
+            document.getElementById('hw_name2').innerHTML = "Homework"; //此处初始化用于测试，实际要从后台获取名称
+            var hw_tyle = 0; //0代表在线答题，1代表上传文件
+            var if_file = 1; //0代表没有附加文件可下载，1代表有
+            var hw_form = document.getElementById('hw_form'); //题目表
+            if (hw_tyle === 1) {
+                hw_form.innerHTML = '<h4>附加的说明：</h4>';
+                var hw_detail = ' habitant morbi tristique senectus\nPellentesque habitant morbi tristique senectus'; //作业描述
+                var hw_p = hw_detail.split('\n');
+                var p;
+                var segment = document.createElement('div');
+                segment.className = 'ui raised segment';
+                hw_form.appendChild(segment);
+                for (i in hw_p) {
+                    p = document.createElement('p');
+                    p.setAttribute('style', 'text-indent:2em'); //逐段打印内容，首行缩进2字符
+                    p.innerHTML = hw_p[i];
+                    segment.appendChild(p);
+                }
+                hw_form.innerHTML += '<div class = "ui hidden divider"></div>';
+                if (if_file === 1) {
+                    hw_form.innerHTML += '<h4>' + '附加的文件(点击下载)' + '</h4>';
+                    segment = document.createElement('div');
+                    segment.className = 'ui raised segment';
+                    hw_form.appendChild(segment);
+                    var file = document.createElement('a');
+                    file.setAttribute('download', 'uml.pdf'); //设置下载时使用的文件名
+                    file.setAttribute('href', 'href="download/acme-doc-2.0.1.txt"'); //设置下载链接
+                    file.innerHTML = 'uml.pdf'; //文件名
+                    segment.appendChild(file);
+                }
+                hw_form.innerHTML += '<div class="ui hidden divider"></div>' +
+                    '<h4>请输入分数：</h4>\n' +
+                    '<div class="ui input">\n' +
+                    '<input type="text" placeholder="请输入分数：">\n' +
+                    '</div>\n' +
+                    '<div class="ui hidden divider"></div>' +
+                    '<h4>请输入评价：</h4>\n' +
+                    '<textarea rows="4" id="other_question"></textarea>' +
+                    '<div class="ui hidden divider"></div>' +
+                    '<button class="ui button" onclick="submit_mark()">提交</div>'
+            } else if (hw_tyle === 0) {
+                var flag = 1; //0代表判断题，1代表选择题，2代表简答题，此处初始化是为了测试，实际要在循环里从后台取值
+                var ToF = [];
+                ToF[0] = 'T';
+                ToF[1] = 'F';
+                var question_id; //这个不是题号，是input标签里的name属性，没有这个属性选择题跟判断题会出错
+                var question; //问题内容
+                var div; //每道题的起始标签都为div
+                var label; //题目的内容放在<label></label>里
+                var field_div = []; //选项的div，类型为field，简答题用field_div[0]表示文本框
+                var checkbox_div = []; //判断题、选择题的选项div（指的是前面用来点击的小圆圈）
+                var checkbox_label; //checkbox的内容label
+                var answer_detail; //答案内容
+                var answer_p;
+                var tmp;
+                var answer_segment;
+                var checkbox; //学生选择的选项，用0，1，...表示，用于选择题和判断题
+                for (var i = 0; i < 5; i++) { //题目总数从后台获得
+                    question_id = "q" + i;
+                    question = '这门课的老师是谁?'; //问题，从后台获得
+                    div = document.createElement('div'); //创建这道题的div
+                    hw_form.appendChild(div); //将这道题的div加入题目表div
+                    label = document.createElement('label'); //创建题名label
+                    label.innerHTML = i + 1 + '. ' + question; //题名
+                    div.appendChild(label); //将题名label加入到题目div中
+                    div.className = 'grouped fields'; //设置这道题的div类型
+                    if (flag === 3) { //简答题
+                        field_div[0] = document.createElement('div'); //创建输入框class
+                        field_div[0].className = 'field'; //设置输入框class
+                        div.appendChild(field_div[0]); //将该div加入到上面创建的题目div中
+                        answer_detail = 'habitant morbi tristique senectus\nPellentesque habitant morbi tristique senectus'; //答案内容
+                        answer_p = answer_detail.split('\n');
+                        answer_segment = document.createElement('div');
+                        answer_segment.className = 'ui raised segment';
+                        field_div[0].appendChild(answer_segment);
+                        var j = 0;
+                        for (j = 0; j < answer_p.length; j++) {
+                            tmp = document.createElement('p');
+                            tmp.setAttribute('style', 'text-indent:2em'); //逐段打印内容，首行缩进2字符
+                            tmp.innerHTML = answer_p[j];
+                            answer_segment.appendChild(tmp);
+                        }
+                        flag = 0; //用来测试，实际无需
+                        field_div[0].innerHTML += '<div class="ui hidden divider"></div>' +
+                            '<h5>请输入本题分数：</h5>\n' +
+                            '<div class="ui input">\n' +
+                            '<input type="text" placeholder="请输入本题分数：">\n' +
+                            '</div>\n'
+                    } else {
+                        if (flag === 0) { //判断题
+                            checkbox = 0; //选择的选项
+                            for (var k = 0; k < 2; k++) {
+                                field_div[k] = document.createElement('div'); //创建选项的div field
+                                field_div[k].className = 'field'; //设置选项class为field
+                                div.appendChild(field_div[k]); //将该div加入到上面创建的题目div中
+                                checkbox_div[k] = document.createElement('div'); //创建checkbox
+                                checkbox_div[k].className = 'ui radio checkbox';
+                                //设置class
+
+                                field_div[k].appendChild(checkbox_div[k]); //将checkbox加到这个选项的div中
+                                if (checkbox === k) {
+                                    checkbox_div[k].innerHTML = '<input type="radio" name="' + question_id + '" checked="checked" disabled="disabled">'; //加入被选中的input标签
+                                } else {
+                                    checkbox_div[k].innerHTML = '<input type="radio" name="' + question_id + '" disabled="disabled">';
+                                }
+                                label = document.createElement('label'); //创建选项内容标签
+                                checkbox_div[k].appendChild(label); //将选项内容标签加入checkbox
+                                label.innerHTML = ToF[k];
+                            }
+                            flag++; //用来测试，实际无需
+                        } else if (flag === 1) { //单选题
+                            checkbox = 2; //获得选项
+                            var choice = []; //各个选项的内容，后端完成时用循环获取选项内容
+                            choice[0] = '邢卫';
+                            choice[1] = '吴朝晖';
+                            choice[2] = '薛伟';
+                            choice[3] = '没有老师';
+                            div.className = 'grouped fields'; //设置这道题的div的class
+                            for (var j = 0; j < 4; j++) { //选项总数从后台获得
+                                field_div[j] = document.createElement('div'); //创建选项的div field
+                                field_div[j].className = 'field'; //设置选项class为field
+                                div.appendChild(field_div[j]); //将该div加入到上面创建的题目div中
+                                checkbox_div[j] = document.createElement('div'); //创建checkbox
+                                checkbox_div[j].className = 'ui radio checkbox'; //设置class
+                                field_div[j].appendChild(checkbox_div[j]); //将checkbox加到这个选项的div中
+                                if (checkbox === j) {
+                                    checkbox_div[j].innerHTML = '<input type="radio" name="' + question_id + '" checked="checked" disabled="disabled">'; //加入被选中的input标签
+                                } else
+                                    checkbox_div[j].innerHTML = '<input type="radio" name="' + question_id + '" disabled="disabled">'; //加入input标签
+                                label = document.createElement('label'); //创建选项内容标签
+                                checkbox_div[j].appendChild(label); //将选项内容标签加入checkbox
+                                label.innerHTML = choice[j];
+                            }
+                            flag = 3; //用来测试，实际无需
+                        }
+                    }
+                }
+                hw_form.innerHTML += '<div class="ui hidden divider"></div>';
+                var button2 = document.createElement('button');
+                button2.className = 'ui button';
+                button2.setAttribute('onclick', 'submit_mark()');
+                button2.innerHTML = '提交';
+                hw_form.parentNode.appendChild(button2);
+            }
+            $('.ui.checkbox').checkbox();
+        }
+
+        function submit_mark() {
+            //......
+            alert('提交成功');
+        }
+    </script>
+    <script>
+        //文件上传函数
+        function bs_input_file() {
+            $(".input-file").before(
+                function() {
+                    if (!$(this).prev().hasClass('input-ghost')) {
+                        var element = $("<input type='file' class='input-ghost' style='visibility:hidden; height:0'>");
+                        element.attr("name", $(this).attr("name"));
+                        element.change(function() {
+                            element.next(element).find('input').val((element.val()).split('\\').pop());
+                        });
+                        $(this).find("button.btn-choose").click(function() {
+                            element.click();
+                        });
+                        $(this).find("button.btn-reset").click(function() {
+                            element.val(null);
+                            $(this).parents(".input-file").find('input').val('');
+                        });
+                        $(this).find('input').css("cursor", "pointer");
+                        $(this).find('input').mousedown(function() {
+                            $(this).parents('.input-file').prev().click();
+                            return false;
+                        });
+                        return element;
+                    }
+                }
+            );
+        }
+
+        $(function() {
+            bs_input_file();
+        });
+    </script>
+</head>
+
+
+<body onload="init()">
+
+
+    <!--顶部菜单栏-->
+    <div class="ui container" style="width: 62%;margin-top: 10px">
+        <div class="ui items">
+            <div class="item">
+                <a class="ui tiny image">
+                    <img src="{% static 'img/zju4.jpg' %}">
+                </a>
+                <div class="middle aligned content">
+                    <a class="header">浙江大学教学服务系统</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ui hidden divider"></div>
+    <!--菜单栏-->
+    <div class="ui vertical masthead center aligned">
+        <div class="ui container" style="width: 63%">
+            <div class="ui attached small red visible menu">
+                <a class="active item" data-tab="hw_list" id="hw_tab">作业内容</a>
+                <a class="item" data-tab="record" id="record_tab">提交记录</a>
+                <div class="right menu">
+                    <div class="ui action input">
+                        <select class="ui compact selection dropdown">
+                        <option selected="" value="courses">课程</option>
+                        <option value="teachers">教师</option>
+                    </select>
+                        <input class="prompt" type="text" placeholder="搜索课程或教师">
+                        <button class="ui icon button">
+                        <i class="search icon"></i>
+                    </button>
+                    </div>
+                </div>
+                <a class="item" href="/student/student_courses">返回</a>
+                <a class="item" href="logout">退出</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui hidden divider"></div>
+
+    <!--作业内容-->
+    <div class="ui bottom attached active tab" data-tab="hw_list" style="min-height: 590px;">
+        <div class="ui container">
+            <div class="ui form">
+                <div class="field">
+                    <h1 class="ui header" id="hw_name2"></h1>
+                </div>
+            </div>
+            <div class="ui hidden divider"></div>
+            <div class="ui form" id="hw_form">
+                <!--作业正文-->
+            </div>
+        </div>
+    </div>
+    <!--提交记录-->
+    <div class="ui bottom attached tab" data-tab="record" style="min-height: 590px;">
+        <div class="ui container">
+            <table class="ui striped celled table">
+                <thead>
+                    <th>时间</th>
+                    <th class="two wide center aligned">操作</th>
+                </thead>
+                <tbody>
+                    {% for foo in SubmitRecord %}
+
+                    <tr>
+                        <td>{{ foo.0 }}</td>
+                        {% ifequal foo.1 0 %}
+                        <td class="two wide center aligned">保存</td>
+                        {% else %}
+                        <td class="two wide center aligned">提交</td>
+                        {% endifequal %}
+
+                    </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!--底部友情链接-->
+    <div class="ui footer basic segment" style="background-color: #E0E0E0;">
+        <div class="ui center aligned container">
+            <div class="ui stackable divided equal height stackable grid">
+                <div class="five wide column">
+                    <h4 class="ui header">友情链接</h4>
+                    <div class="ui link list">
+                        <a href="http://www.zju.edu.cn" class="item">浙江大学官方网站</a>
+                        <a href="http://jwbinfosys.zju.edu.cn/default2.aspx" class="item">浙江大学现代教务管理系统</a>
+                        <a href="http://www.cs.zju.edu.cn/" class="item">浙江大学计算机科学与技术学院</a>
+                        <a href="http://www.cc98.org/" class="item">CC98论坛</a>
+                    </div>
+                </div>
+                <div class="five wide column">
+                    <h4 class="ui header">常用网站导航</h4>
+                    <div class="ui link list">
+                        <a href="https://github.com/" class="item">GitHub</a>
+                        <a href="https://scholar.google.com/" class="item">Gooele Scholar</a>
+                        <a href="https://translate.google.cn/" class="item">Google Translate</a>
+                        <a href="http://www.cnki.net/" class="item">中国知网</a>
+                    </div>
+                </div>
+                <div class="four wide column">
+                    <h4 class="ui header">资源导航</h4>
+                    <div class="ui link list">
+                        <a href="http://mirrors.zju.edu.cn/#list" class="item">浙江大学开源镜像站</a>
+                        <a href="https://www.jiumodiary.com/" class="item">Jiumo E-Book Search</a>
+                        <a href="http://www.nexushd.org/index.php" class="item">NexusHD</a>
+                        <a href="ftp://software.cc98.org/" class="item">CC98资源站</a>
+                    </div>
+                </div>
+            </div>
+            <div class="ui inverted section divider"></div>
+            <h4>浙江大学2015级软件需求工程、软件工程管理G04课程组开发</h4>
+        </div>
+    </div>
+</body>
+
+</html>

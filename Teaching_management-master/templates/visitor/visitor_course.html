@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0"> {% load staticfiles %}
+    <title>浙江大学教学服务系统</title>
+    <!-- 使用本地的样式与js文件 -->
+    <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap-4.0.0-alpha.6-dist/js/bootstrap.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/tab.css' %}">
+    <link rel="stylesheet" href="{% static 'css/pagination.css' %}">
+    <link rel="stylesheet" href="{% static 'Semantic-UI-master/dist/semantic.min.css' %}">
+    <script type="text/javascript" src="{% static 'Semantic-UI-master/dist/semantic.min.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+            $('.ui .item[data-tab]').on('click', function() {
+                $('.ui .item[data-tab]').removeClass('active');
+                $(this).addClass('active');
+                var tab = $(this).attr("data-tab");
+                $(".tab").removeClass("active");
+                $(".tab[data-tab=\"" + tab + "\"]").addClass("active");
+                var second_item = document.getElementById('second_item');
+                second_item.innerHTML = trans(tab);
+            });
+            $('.sidebar').sidebar({
+                dimPage: false,
+                closable: false
+            });
+            //处理bootstrap的tab点击，有bug
+            $('[data-toggle="tab"]').click(function() {
+                $('[data-toggle="tab"]').removeClass('active');
+                $(this).parent('li').addClass('active');
+            })
+
+        });
+
+        //通过button的value来定位对应的modal的id，实现modal.show
+        function showModal(e) {
+            $("#" + e.value).modal('show');
+        }
+
+        function HideModal() {
+            $('.ui .modal').modal('hide');
+        }
+    </script>
+    <script>
+        //初始化课程大纲页面
+        function init_syllabus() {
+            //以下部分初始化课程简介
+            var summary = '这门课程叫软件需求工程'; //简介内容从后台获得
+            var p = document.createElement('p'); //创建段落标签
+            var div_summary = document.getElementById('summary'); //获得课程简介div的id
+            div_summary.appendChild(p); //将段落加入课程简介div中
+            p.innerHTML = summary;
+            $('#modify_summary').val(summary);
+            //以下部分初始化课程日历
+            var arrangement_td = []; //表格每栏的内容，从后台获取
+            arrangement_td[0] = '2017.12.12'; //此处初始化用于测试
+            arrangement_td[1] = '13:15~15:40';
+            arrangement_td[2] = '第一次上课';
+            arrangement_td[3] = '教7-604';
+            var tbody = document.getElementById('calendars'); //tbody标签
+            var tr; //表格tr标签
+            var td = []; //表格td标签
+            for (var i = 0; i < 10; i++) { //此处设置安排为10条，实际要从后台获得
+                tr = document.createElement('tr');
+                tbody.appendChild(tr); //创建tr标签并加入tbody中
+                for (var j = 0; j < 4; j++) {
+                    td[j] = document.createElement('td');
+                    td[j].innerHTML = arrangement_td[j];
+                    tr.appendChild(td[j]); //创建四个td标签并加入tr中
+                }
+                td[0].className = 'collapsing';
+                td[1].className = 'collapsing';
+                td[3].className = 'right aligned collapsing'; //设置第0、1、3个td的class*/
+            }
+        }
+    </script>
+</head>
+
+<body onload="init_syllabus()">
+    <div class="pusher" id="pusher">
+        <!--顶部-->
+        <div class="ui container" style="width: 62%;margin-top: 10px">
+            <div class="ui items">
+                <div class="item">
+                    <a class="ui tiny image">
+                        <img src="{% static 'img/zju4.jpg' %}">
+                    </a>
+                    <div class="middle aligned content">
+                        <a class="header">欢迎使用浙江大学教学服务系统</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ui hidden divider"></div>
+        <!--菜单栏-->
+        <div class="ui vertical masthead center aligned">
+            <div class="ui container" style="width: 63%">
+                <div class="ui attached small red visible menu">
+                    <a class="item" href="/visitor">课程浏览</a>
+                    <a class="active item" data-tab="syllabus">课程大纲</a>
+                    <div class="right menu">
+                        <div class="ui action input">
+                            <input class="prompt" type="text" placeholder="搜索课程">
+                            <button class="ui icon button">
+                            <i class="search icon"></i>
+                        </button>
+                        </div>
+                    </div>
+                    <a class="item" href="http://127.0.0.1:8000/register">注册</a>
+                    <a class="item" href="http://127.0.0.1:8000">登录</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui hidden divider"></div>
+        <!--课程大纲tab-->
+        <div class="ui bottom attached active tab" data-tab="syllabus" style="min-height: 600px">
+            <div class="ui container" style="width: 63%;">
+                <div class="ui segment" id="summary">
+                    <h2>课程简介</h2>
+                </div>
+
+                <table class="ui celled striped table" id="calendars_table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>时间</th>
+                            <th>安排</th>
+                            <th>地点</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calendars">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!--底部友情链接-->
+        <div class="ui footer basic segment" style="background-color: #E0E0E0;">
+            <div class="ui center aligned container">
+                <div class="ui stackable divided equal height stackable grid">
+                    <div class="five wide column">
+                        <h4 class="ui header">友情链接</h4>
+                        <div class="ui link list">
+                            <a href="http://www.zju.edu.cn" class="item">浙江大学官方网站</a>
+                            <a href="http://jwbinfosys.zju.edu.cn/default2.aspx" class="item">浙江大学现代教务管理系统</a>
+                            <a href="http://www.cs.zju.edu.cn/" class="item">浙江大学计算机科学与技术学院</a>
+                            <a href="http://www.cc98.org/" class="item">CC98论坛</a>
+                        </div>
+                    </div>
+                    <div class="five wide column">
+                        <h4 class="ui header">常用网站导航</h4>
+                        <div class="ui link list">
+                            <a href="https://github.com/" class="item">GitHub</a>
+                            <a href="https://scholar.google.com/" class="item">Gooele Scholar</a>
+                            <a href="https://translate.google.cn/" class="item">Google Translate</a>
+                            <a href="http://www.cnki.net/" class="item">中国知网</a>
+                        </div>
+                    </div>
+                    <div class="four wide column">
+                        <h4 class="ui header">资源导航</h4>
+                        <div class="ui link list">
+                            <a href="http://mirrors.zju.edu.cn/#list" class="item">浙江大学开源镜像站</a>
+                            <a href="https://www.jiumodiary.com/" class="item">Jiumo E-Book Search</a>
+                            <a href="http://www.nexushd.org/index.php" class="item">NexusHD</a>
+                            <a href="ftp://software.cc98.org/" class="item">CC98资源站</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui inverted section divider"></div>
+                <h4>浙江大学2015级软件需求工程、软件工程管理G04课程组开发</h4>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
