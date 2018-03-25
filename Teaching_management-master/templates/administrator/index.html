@@ -85,7 +85,12 @@
             alert('删除成功');
             HideModal();
         }
+        function deleteliuyan(id) {
 
+            alert('删除成功');
+            window.location.href='deleteliuyan/'+id
+            HideModal();
+        }
         //是否重置密码
         function if_reset_pwd() {
             $('#reset_pwd').modal('setting', 'closable', false).modal('show');
@@ -390,7 +395,7 @@
                                         <td class="two wide">{{ j.4 }}</td>
                                         <td>{{ j.5 }}楼</td>
                                         <td class="collapsing">
-                                            <div class="ui right floated tiny button">删除</div>
+                                            <div class="ui right floated tiny button" onclick="deleteliuyan({{ j.6 }})" >删除</div>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -417,7 +422,7 @@
                                         <td class="two wide">{{ j.4 }}</td>
                                         <td>{{ j.5 }}楼</td>
                                         <td class="collapsing">
-                                            <div class="ui right floated tiny button">删除</div>
+                                            <div class="ui right floated tiny button" >删除</div>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -436,18 +441,27 @@
         </div>
         <div class="ui hidden divider"></div>
 
-        <div class="ui container" style='width: 80%;' id="container2">
+
+
+        <div class="ui container" style='width: 80%;' id="container2" >
             <div class="ui form">
                 <div class="field">
                     <h3>发表留言：</h3>
-                    <textarea rows="8" id="reply_text"></textarea>
-                </div>
-                <button class="ui button" onclick="reply1()">
-                    发表
-                </button>
+                    <form action="liuyan" id="usrform" method="post">
+                        <textarea rows="8" cols="50" name="comment" form="usrform"></textarea>
+
+                        {% csrf_token %}
+                         <br> <br> <br>
+                        <input type="submit" class="ui button" value="发表" onclick="reply1()">
+                    </form>
             </div>
             <div class="ui hidden divider"></div>
         </div>
+
+
+
+
+
     </div>
 
     <!--底部友情链接-->
