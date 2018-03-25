@@ -89,16 +89,19 @@
 
             alert('删除成功');
             window.location.href='deleteliuyan/'+id
+
             HideModal();
         }
         //是否重置密码
-        function if_reset_pwd() {
+        function if_reset_pwd(id) {
             $('#reset_pwd').modal('setting', 'closable', false).modal('show');
+
         }
 
         //确认重置密码
-        function confirm_reset() {
-            alert('重置成功');
+        function confirm_reset(id) {
+            alert('重置成功')
+            window.location.href='resetpass/'+id
             HideModal();
         }
         function  reply1() {
@@ -296,7 +299,7 @@
                                     <th class="center aligned two wide">用户编号</th>
                                     <th class="center aligned two wide">姓名</th>
                                     <th class="center aligned">电子邮箱</th>
-                                    <th class="center aligned">联系电话</th>
+                                    <th class="center aligned">注册日期</th>
                                     <th>重置密码</th>
                                 </tr>
                                 </thead>
@@ -316,7 +319,7 @@
                                             {{ foo.3 }}
                                         </td>
                                         <td class="collapsing">
-                                            <div class="ui button" onclick="if_reset_pwd()">重置密码</div>
+                                            <div class="ui button" onclick="confirm_reset({{ foo.0 }})">重置密码</div>
                                         </td>
                                     </tr>
                                 {% endfor %} {% endfor %}
@@ -331,7 +334,7 @@
                                     <th class="center aligned two wide">用户编号</th>
                                     <th class="center aligned two wide">姓名</th>
                                     <th class="center aligned">电子邮箱</th>
-                                    <th class="center aligned">联系电话</th>
+                                    <th class="center aligned">注册日期</th>
                                     <th>重置密码</th>
                                 </tr>
                                 </thead>
@@ -351,7 +354,7 @@
                                             {{ foo.3 }}
                                         </td>
                                         <td class="collapsing">
-                                            <div class="ui button" onclick="if_reset_pwd()">重置密码</div>
+                                            <div class="ui button" onclick="confirm_reset({{ foo.0 }})">重置密码</div>
                                         </td>
                                     </tr>
                                 {% endfor %} {% endfor %}
