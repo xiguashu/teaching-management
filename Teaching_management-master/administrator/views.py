@@ -7,7 +7,7 @@ from teacher.models import UserInfo, TeacherInfo, StudentInfo, ManagerInfo, Cour
                            CourseTime, Homework, MultipleChoice, ShortAnswer, HwOfCourse, \
                            StudentAnswer, HwGrade, ForumList, PostReply, Source, Message, \
                            Announcement, Customer, IsRead,Liuyan
-
+from django.contrib.auth.models import User
 from django.db import models
 import time
 
@@ -87,22 +87,14 @@ def index(request):
         liuyanPaginator.append(tmp)
         tmp = []
     # 用户表
-    UserList = [['3150100000', '王泽杰', '10086@zju.edu.cn', '10086'],
-                ['3150100000', '王泽杰', '10086@zju.edu.cn', '10086'],
-                ['3150100000', '王泽杰', '10086@zju.edu.cn', '10086'],
-                ['3150100000', '王泽杰', '10086@zju.edu.cn', '10086'],
-                ['3150100000', '王泽杰', '10086@zju.edu.cn', '10086'],
-                ['3150100000', '王泽杰', '10086@zju.edu.cn', '10086'],
-                ['3150100000', '王泽杰', '10086@zju.edu.cn', '10086'],
-                ['3150100000', '王泽杰', '10086@zju.edu.cn', '10086'],
-                ['3150100000', '王泽杰', '10086@zju.edu.cn', '10086'],
-                ['3150100000', '王泽杰', '10086@zju.edu.cn', '10086'],
-                ['3150100000', '王泽杰', '10086@zju.edu.cn', '10086'],
-                ['3150100000', '王泽杰', '10086@zju.edu.cn', '10086'],
-                ['3150100000', '王泽杰', '10086@zju.edu.cn', '10086'],
-                ['3150100000', '王泽杰', '10086@zju.edu.cn', '10086'],
-                ['3150100000', '王泽杰', '10086@zju.edu.cn', '10086'],
-                ['3150100000', '王泽杰', '10086@zju.edu.cn', '10086'],]
+    userall=User.objects.all()
+    counts=userall.count()
+    UserList=[[0 for i in range(4)] for i in range(counts)]
+
+    k=0
+    for item in userall:
+        UserList[k]=[item.id,item.username,item.email,item.date_joined]
+        k=k+1
 
     UserPage = Paginator(UserList, 10)
     UserPaginator = []
@@ -121,10 +113,9 @@ def index(request):
 
 
 @user_passes_test(admincheck, login_url="/login")
-def courses(request,idd):
-    print(id)
+def courses(request,id):
 
-    course=CourseInfo.objects.get(course_name=idd)
+    course=CourseInfo.objects.get(course_name=id)
     CourseInfomation=[course.course_id,course.course_name,course.course_depart,course.course_credits,course.course_teacher]
     # 课程信息表，包括课程号，课程名，开课学院，开班数，本班教师
 
@@ -135,6 +126,9 @@ def courses(request,idd):
         [['路东明'], '春夏', ['周日第11,12节', '周一第3,4,5节'], ['玉泉曹光彪西-503', '玉泉教7-304(多)'], '2018/01/20, 08:00:00'],
         [['陈纯'], '春夏', ['周二第7,8节', '周一第3,4,5节'], ['玉泉曹光彪西-503', '玉泉曹光彪二期-202(多)'], '2018/01/20, 08:00:00'], ]
 
+    #courseall=CourseInfo.objects.get()
+    #counts=courseall.count()
+    #liuyanList = [[0 for i in range(6)] for i in range(counts)]
     # 教师信息表
     # 包括教工号，姓名，职称，学院，邮箱，联系电话
     TeacherList = [['215010', '邢卫', '教授', '计算机科学与技术学院', '10086@zju.edu.cn', '18888888888'],
@@ -175,4 +169,10 @@ def liuyan(request):
 
 def deleteliuyan(request,id):
     Liuyan.objects.filter(id=id).delete()
+    return HttpResponseRedirect("/administrator/")
+
+def resetpass(request,id):
+    us=User.objects.get(id=id)
+    us.set_password('123456')
+    us.save();
     return HttpResponseRedirect("/administrator/")
