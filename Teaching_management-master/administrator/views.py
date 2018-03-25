@@ -8,6 +8,8 @@ from teacher.models import UserInfo, TeacherInfo, StudentInfo, ManagerInfo, Cour
                            StudentAnswer, HwGrade, ForumList, PostReply, Source, Message, \
                            Announcement, Customer, IsRead,Liuyan
 
+from django.db import models
+import time
 
 def admincheck(user):
     try:
@@ -74,7 +76,7 @@ def index(request):
             img='/static/Semantic-UI-master/examples/assets/images/avatar/tom.jpg'
             role='游客'
         liuyanList[k]=[img,liuyanall[k].name,role,liuyanall[k].content,
-                       liuyanall[k].datetime,k+1]
+                       liuyanall[k].datetime,k+1,liuyanall[k].id]
         k+=1
 
     liuyanPage = Paginator(liuyanList, 10)
@@ -119,11 +121,10 @@ def index(request):
 
 
 @user_passes_test(admincheck, login_url="/login")
-def courses(request,id):
+def courses(request,idd):
     print(id)
 
-    course=CourseInfo.objects.get(course_name=id)
-    print(course.course_teacher)
+    course=CourseInfo.objects.get(course_name=idd)
     CourseInfomation=[course.course_id,course.course_name,course.course_depart,course.course_credits,course.course_teacher]
     # 课程信息表，包括课程号，课程名，开课学院，开班数，本班教师
 
@@ -166,3 +167,12 @@ def courses(request,id):
 def logout(request):
     auth.logout(request)
     return HttpResponseRedirect("/")
+
+def liuyan(request):
+    print(request.user.userinfo.user_type)
+    Liuyan.objects.create(content=request.POST['comment'],datetime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) ,role=request.user.userinfo.user_type,name=request.user.username)
+    return HttpResponseRedirect("/administrator/")
+
+def deleteliuyan(request,id):
+    Liuyan.objects.filter(id=id).delete()
+    return HttpResponseRedirect("/administrator/")
